@@ -12,7 +12,7 @@ import logo from '../../assets/logo.svg';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
-interface FormProps {
+interface FormDTO {
   name: string;
   email: string;
   password: string;
@@ -21,29 +21,22 @@ interface FormProps {
 const Signup: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const handleSubmit = useCallback(async (data: FormProps) => {
+  const handleSubmit = useCallback(async (data: FormDTO): Promise<void> => {
     try {
-      // Garante que os erros serão limpos
+      // Seta os erros como vazio antes de iniciar, porque ao passar na validação
+      // não remove o último erro do form
       formRef.current?.setErrors({});
 
-      console.log(data);
-
       const schema = Yup.object().shape({
-        name: Yup.string().required('Nome é obrigatório'),
+        name: Yup.string().required('Campo obrigatório'),
         email: Yup.string()
-          .required('E-mail é obrigatório')
+          .required('Campo obrigatório')
           .email('Digite um e-mail válido'),
-        password: Yup.string().min(
-          1,
-          'A senha deve possuir pelo menos 6 caracteres',
-        ),
+        password: Yup.string().min(6, 'A senha deve ter no mínimo 6 dígitos'),
       });
 
-      // abortEarly: colocado para validar todos campos ao fazer a validação
-      // caso contrário ele aborta no primeiro erro
       await schema.validate(data, { abortEarly: false });
     } catch (error) {
-      console.log(JSON.stringify(error));
       const errors = getValidationErrors(error);
       formRef.current?.setErrors(errors);
     }
