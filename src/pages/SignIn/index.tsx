@@ -1,10 +1,11 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
+import { AuthContext } from '../../context/AuthContext';
 import getValidationErrors from '../../utils/getValidationErrors';
 import { Cointainer, Content, Background } from './styles';
 import logo from '../../assets/logo.svg';
@@ -20,23 +21,33 @@ interface FormDTO {
 const Signin: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const handleSubmit = useCallback(async (data: FormDTO): Promise<void> => {
-    try {
-      formRef.current?.setErrors({});
+  const { handleSignIn } = useContext(AuthContext);
 
-      const schema = Yup.object().shape({
-        email: Yup.string()
-          .required('Campo obrigatório')
-          .email('Digite um e-mail válido'),
-        password: Yup.string().required('Campo obrigatório'),
-      });
+  const handleSubmit = useCallback(
+    async (data: FormDTO): Promise<void> => {
+      try {
+        formRef.current?.setErrors({});
 
-      await schema.validate(data, { abortEarly: false });
-    } catch (error) {
-      const errors = getValidationErrors(error);
-      formRef.current?.setErrors(errors);
-    }
-  }, []);
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('Campo obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().required('Campo obrigatório'),
+        });
+
+        await schema.validate(data, { abortEarly: false });
+
+        handleSignIn({
+          email: data.email,
+          password: data.password,
+        });
+      } catch (error) {
+        const errors = getValidationErrors(error);
+        formRef.current?.setErrors(errors);
+      }
+    },
+    [handleSignIn],
+  );
 
   return (
     <Cointainer>
