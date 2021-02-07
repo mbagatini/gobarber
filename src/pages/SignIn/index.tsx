@@ -5,7 +5,8 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import { useAuth } from '../../hooks/AuthContext';
+import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
 import { Cointainer, Content, Background } from './styles';
 import logo from '../../assets/logo.svg';
@@ -20,7 +21,9 @@ interface FormDTO {
 
 const Signin: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+
   const { handleSignIn } = useAuth();
+  const { addToast } = useToast();
 
   const handleSubmit = useCallback(
     async (data: FormDTO): Promise<void> => {
@@ -36,7 +39,7 @@ const Signin: React.FC = () => {
 
         await schema.validate(data, { abortEarly: false });
 
-        handleSignIn({
+        await handleSignIn({
           email: data.email,
           password: data.password,
         });
@@ -44,10 +47,18 @@ const Signin: React.FC = () => {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
           formRef.current?.setErrors(errors);
+          return;
         }
+
+        addToast({
+          type: 'error',
+          title: 'Falha na autenticação',
+          description:
+            'Não foi possível autenticar o usuário, confira o e-mail e senha',
+        });
       }
     },
-    [handleSignIn],
+    [handleSignIn, addToast],
   );
 
   return (
