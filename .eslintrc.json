@@ -41,6 +41,16 @@
         "allowExpressions": true
       }
     ],
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "extendDefaults": true,
+        "types": {
+          "{}": false,
+          "object": false
+        }
+      }
+    ],
     "import/extensions": [
       "error",
       "ignorePackages",
