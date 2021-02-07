@@ -37,8 +37,10 @@ const Signup: React.FC = () => {
 
       await schema.validate(data, { abortEarly: false });
     } catch (error) {
-      const errors = getValidationErrors(error);
-      formRef.current?.setErrors(errors);
+      if (error instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(error);
+        formRef.current?.setErrors(errors);
+      }
     }
   }, []);
 
