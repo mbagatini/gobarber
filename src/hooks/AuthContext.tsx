@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useState } from 'react';
+import React, { createContext, useContext, useCallback, useState } from 'react';
 
 import api from '../services/api';
 
@@ -14,10 +14,11 @@ interface AuthState {
 
 interface AuthContextDTO {
   handleSignIn(credentials: SignInCredentials): Promise<void>;
+  handleSignOut(): void;
   user: object;
 }
 
-export const AuthContext = createContext<AuthContextDTO>({} as AuthContextDTO);
+const AuthContext = createContext<AuthContextDTO>({} as AuthContextDTO);
 
 export const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>(() => {
@@ -45,9 +46,27 @@ export const AuthProvider: React.FC = ({ children }) => {
     setData({ token, user });
   }, []);
 
+  const handleSignOut = useCallback(() => {
+    localStorage.removeItem('@GoBarber:token');
+    localStorage.removeItem('@GoBarber:user');
+    setData({} as AuthState);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user: data.user, handleSignIn }}>
+    <AuthContext.Provider
+      value={{ user: data.user, handleSignIn, handleSignOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
+
+export function useAuth(): AuthContextDTO {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+
+  return context;
+}

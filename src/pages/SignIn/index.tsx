@@ -1,11 +1,11 @@
-import React, { useRef, useCallback, useContext } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import { AuthContext } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/AuthContext';
 import getValidationErrors from '../../utils/getValidationErrors';
 import { Cointainer, Content, Background } from './styles';
 import logo from '../../assets/logo.svg';
@@ -20,8 +20,7 @@ interface FormDTO {
 
 const Signin: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-
-  const { handleSignIn } = useContext(AuthContext);
+  const { handleSignIn } = useAuth();
 
   const handleSubmit = useCallback(
     async (data: FormDTO): Promise<void> => {
