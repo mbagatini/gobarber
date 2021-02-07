@@ -12,13 +12,13 @@ interface AuthState {
   user: object;
 }
 
-interface AuthContextDTO {
+interface AuthContextData {
   handleSignIn(credentials: SignInCredentials): Promise<void>;
   handleSignOut(): void;
   user: object;
 }
 
-const AuthContext = createContext<AuthContextDTO>({} as AuthContextDTO);
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>(() => {
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   );
 };
 
-export function useAuth(): AuthContextDTO {
+export function useAuth(): AuthContextData {
   const context = useContext(AuthContext);
 
   if (!context) {
